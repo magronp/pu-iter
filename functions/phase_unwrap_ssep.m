@@ -44,7 +44,7 @@ for t=2:T
         for k=1:K
             if (UN(k,t)==0) % non-onset frame for source k
                 if unwr
-                    f_inf = freq_influence(abs(Ye(:,t,k))+eps)-1;
+                    f_inf = get_frequencies_qifft_frame(abs(Ye(:,t,k))+eps);
                     phiaux = angle(Ye(:,t-1,k))+Ct*f_inf;
                     Ye(:,t,k) = abs(Ye(:,t,k)) .* exp(1i * phiaux);
                 else
@@ -80,7 +80,7 @@ end
 
 
 % PU: frequencies and regions of influence
-function [f_inf,f_centr,f_harm] = freq_influence(v)
+function [f_inf,f_centr,f_harm] = get_frequencies_qifft_frame(v)
 
 v = v(:)';
 
@@ -112,7 +112,7 @@ if (Nfreq >0)
         index_lim(ind) = fin;
     end
 
-    f_inf(deb:end) = f_harm(end);
+    f_inf(deb:end) = f_harm(end)-1;
     
 else
     f_inf = (1:length(v))'-1;
