@@ -21,7 +21,7 @@ if nargin<3
 end
 
 % Get frequencies and decomposition in regions of influence
-f_inf = freq_unwrap(V);
+f_inf = get_frequencies_qifft(V);
 Nfft = 2*(F-1);
 Ct = 2*pi*hop/Nfft;
 
@@ -37,7 +37,7 @@ phi = angle(exp(1i*phi));
 end
 
 % Frequencies and decomposition in regions of influence
-function [f_inf,f_centr,f_harm] = freq_unwrap(V)
+function [f_inf,f_centr,f_harm] = get_frequencies_qifft(V)
 
 [F,T] = size(V);
 
@@ -47,58 +47,47 @@ f_centr = zeros(F,T);
 f_harm = cell(1,T);
 
 for t=1:T
-    [inf,centr,harm] = freq_influence(abs(V(:,t)));
-    f_inf(:,t) = inf-1;
-    if isempty(centr)
-        f_centr(:,t) = 0;
+    
+    v = V(:,t)';
+
+    % Magnitude peaks
+    [~,centr] = findpeaks(max(v,10^-6),'MINPEAKHEIGHT',max(v)*10^-2);
+
+    Nfreq = length(centr);
+    harm = zeros(1,Nfreq);
+
+    if (Nfreq >0)
+        % Quadratic interpolation of frequencies
+        for ind = 1:Nfreq
+            f = centr(ind);
+            harm(ind) = qint((log(v(f-1))),(log(v(f))),(log(v(f+1))))+f;
+        end
+
+        % Frequencies in Regions of influence
+        inf = zeros(length(v),1);
+        deb = 1;
+        index_lim = zeros(1,Nfreq-1);
+
+        for ind = 1:(Nfreq-1)
+            f = centr(ind);
+            fp = centr(ind+1);
+            fin = floor((v(fp)*f+v(f)*fp)/(v(fp)+v(f)));
+            inf(deb:fin) = harm(ind);
+            deb = fin+1;
+            index_lim(ind) = fin;
+        end
+
+        inf(deb:end) = harm(end);
+        f_centr(centr(:),t) = 1;
+        
     else
-        c = centr;
-        f_centr(c(:),t) = 1;
+        inf = (1:length(v))'-1;
+        f_centr(:,t) = 0;
     end
+
+    f_inf(:,t) = inf-1;
     f_harm{t} = harm;
 end
-
-
-end
-
-% In one frame
-function [f_inf,f_centr,f_harm] = freq_influence(v)
-
-v = v(:)';
-
-%Central peaks
-[~,f_centr] = findpeaks(max(v,10^-6),'MINPEAKHEIGHT',max(v)*10^-2);
-
-Nfreq = length(f_centr);
-f_harm = zeros(1,Nfreq);
-
-if (Nfreq >0)
-    % Quadratic interpolation of frequencies
-    for ind = 1:Nfreq
-        f = f_centr(ind);
-        f_harm(ind) = qint((log(v(f-1))),(log(v(f))),(log(v(f+1))))+f;
-    end
-
-    % Frequencies in Regions of influence
-    f_inf = zeros(length(v),1);
-    deb = 1;
-    index_lim = zeros(1,Nfreq-1);
-    
-    for ind = 1:(Nfreq-1)
-        f = f_centr(ind);
-        fp = f_centr(ind+1);
-        fin = floor((v(fp)*f+v(f)*fp)/(v(fp)+v(f)));
-        f_inf(deb:fin) = f_harm(ind);
-        deb = fin+1;
-        index_lim(ind) = fin;
-    end
-
-    f_inf(deb:end) = f_harm(end);
-    
-else
-    f_inf = (1:length(v))'-1;
-end
-
 end
 
 % QIFFT
