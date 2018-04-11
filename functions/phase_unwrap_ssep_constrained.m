@@ -1,5 +1,5 @@
-% Estimation of sources from isotropic gaussian models using unwrapping
-% phase prior and a phase constraint
+% Source separation procedure using the phase unwrapping technique
+% initialization and a relaxed phase constraint
 % Paul Magron, May 2016
 %
 % Inputs:
