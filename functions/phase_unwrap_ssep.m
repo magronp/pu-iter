@@ -3,7 +3,9 @@
 %
 % Ref:
 % "Model-based STFT phase recovery for audio source separation",
-% Paul Magron, Roland Badeau and Bertrand David, TASLP, 2018
+% Paul Magron, Roland Badeau and Bertrand David,
+% IEEE/ACM Transactions on Speech, Audio, and Language Processing
+% Vol 26, number 6, June 2018
 %
 % Inputs:
 %     X : F*T mixture
