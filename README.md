@@ -4,7 +4,7 @@ Here, you will find the code related to PU-Iter algorithm for source separation.
 
 If you use any of the things existing in this repository, please cite the [corresponding paper](https://arxiv.org/abs/1608.01953). 
 
-You can also find an online demo with sound examples related to this work on the [companion website](http://www.cs.tut.fi/~magron/demos/demo_PUITER.html).
+You can also find an online demo with sound examples related to this work on the [companion website](https://magronp.github.io/demos/taslp18_puiter.html).
 
 ### Dataset set-up
 
